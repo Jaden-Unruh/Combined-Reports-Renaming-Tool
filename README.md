@@ -18,7 +18,7 @@ Below the four prompts are `Close` and `Run` buttons, these work as would be exp
 ## Troubleshooting
 > Nothing's happening when I double click the `.JAR` file
 
-Ensure you've installed Java as specified under [Setup](#Setup). If you believe you have, try checking your java version:
+Ensure you've installed Java as specified under [Setup](/#Setup). If you believe you have, try checking your java version:
 1. Press Ctrl+R, type `cmd` and press enter - this will open a command prompt window
 2. Type `java -version` and press enter
 3. If you've installed java as specified, the first line under your typing should read `openjdk version "17.0.8" 2023-07-18`. If, instead, it says `'java' is not recognized as an internal...` then java is not installed.
@@ -31,7 +31,7 @@ Ensure that you've selected two directories and a *.xlsx file. Spreadsheets of a
 ---
 > Certain PDFs are being skipped
 
-Ensure that the file structure matches exactly as described in [File Structure](#File-Structure). Files and folders not placed in the correct places will be ignored. Consult `rename-info.txt` to see what's been skipped.
+Ensure that the file structure matches exactly as described in [File Structure](/#File-Structure). Files and folders not placed in the correct places will be ignored. Consult `rename-info.txt` to see what's been skipped.
 
 ---
 > The year on some files is incorrect
@@ -92,9 +92,9 @@ For EISA reports the file format is a bit forgiving, but do still be careful; be
 Note that in either case, reports must have their sub-site id within the file name. In the case that a file does not have a number in its name, it will be skipped and noted in `rename-info.txt`. If there are multiple numbers in the file name, the last one will be used. This is important, for example, in my testing a report was named `343 1st and 2nd Grade.pdf`, and the program tried to pull the '2' as the sub-site id. The reason we don't use the first number is in case a report is already renamed - the sub-site id will be last. For those familiar with Regular Expressions, the expression we use to pull the sub-site id is: `\D*(\d+)\D*(?!.*\d)`.
 
 ## Details of what it does
-First, the script runs some initialization stps: creating rename-info.txt, opening the spreadsheet, and starting Tesseract. Then, it wil navigate through the input directory, finding reports in the places specified in [File Structure](#File-Structure). For each report, it will use the Site Id (and, for EISA reports, the sub-site id), and search the location heirarchy spreadsheet to find the relevant row. From there, it will grab the Maximo Id, Location Number, and Site Name (headed on the spreadsheet as 'Site Description'). Then, to get the year, the program will open the first page of the pdf as an image and use Tesseract, an optical character recognition (OCR) library to pull the text from that page, then find the year within that (again, to those familiar with Regular Expressions, `(\d{2},\s*|\w+\s*)(20\d{2})`[^1]). We then put all this information together and copy the file, renamed, to the output directory.
+First, the script runs some initialization steps: creating rename-info.txt, opening the spreadsheet, and starting Tesseract. Then, it wil navigate through the input directory, finding reports in the places specified in [File Structure](/#File-Structure). For each report, it will use the Site Id (and, for EISA reports, the sub-site id), and search the location heirarchy spreadsheet to find the relevant row. From there, it will grab the Maximo Id, Location Number, and Site Name (headed on the spreadsheet as 'Site Description'). Then, to get the year, the program will open the first page of the pdf as an image and use Tesseract, an optical character recognition (OCR) library to pull the text from that page, then find the year within that (again, to those familiar with Regular Expressions, `(\d{2},\s*|\w+\s*)(20\d{2})`[^1]). We then put all this information together and copy the file, renamed, to the output directory.
 
-[^1] This is a year, 20##, preceded by either two digits and a comma or one or more words. As such, we'll capture either, for example, 'September 23, 2011', or just 'September 2011'. This is necessary because different types of reports format their dates differently.
+[^1]: This is a year, 20##, preceded by either two digits and a comma or one or more words. As such, we'll capture either, for example, 'September 23, 2011', or just 'September 2011'. This is necessary because different types of reports format their dates differently.
 
 ## Changing the Code
 The `.JAR` file is compiled and compressed, meaning it is not human-readable code. If you want to change how the program works, add new features or report types, or anything else, I have uploaded the program files to a github repository uncompiled. That github repository will also include this readme.md (and an HTML version in case you can't open the .md file), as well as the compiled `.JAR`.
