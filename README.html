@@ -1,0 +1,188 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" /><title></title></head><body><h1>Combined Rename Reports Tool</h1>
+<p>A tool to rename AHERA, EISA, FCA Appendix B, and Space Utilization Reports to the standard</p>
+<h2>Setup</h2>
+<p>Java SE 17 is required to run this program. An installer for Temurin/OpenJDK 17 should be included with the file, running the installer will open a window guiding you through the installation. Leaving everything as default should work perfectly, just click through the pages. If the installer is not included, it can be downloaded from <a href="https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8%2B7/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8_7.msi">here</a>. After installing Temurin/Java 17, the <code>.JAR</code> should run just by double-clicking.</p>
+<h2>GUI and How to Use</h2>
+<p>After double-clicking the <code>JAR</code>, a window titled “Rename Reports Tool” will open. It will have four prompts, as described below:</p>
+<ol>
+<li>Select an input directory: <code>Select...</code>
+<ul>
+<li>Click on the select button to open a file prompt, navigate to and select the desired input directory. The input directory should have the file structure as described in <a href="/#File-Structure">File Structure</a>.</li>
+</ul>
+</li>
+<li>Select an output directory: <code>Select...</code>
+<ul>
+<li>Click on the select button to open a file prompt, navigate to and select the desired output directory. This directory does not need to be empty, but ensure that there are no files within the output directory that have the exact same name as the program will try to create, as these files may be overwritten or cause errors. Also note that the program will create a file called <code>rename-info.txt</code> within the output directory, so if such a file already exists the existing one will be deleted.</li>
+</ul>
+</li>
+<li>Select location hierarchy spreadsheet (*.xlsx): <code>Select...</code>
+<ul>
+<li>Click on the select button to open a file prompt, navigate to and select the location hierarchy spreadsheet. Note that this must be a <code>.xlsx</code> file, rather than <code>.xlsb</code>or any other spreadsheet format. This can be obtained by opening any other format in excel and selecting ‘File -&gt; Save As -&gt; This PC’ and choosing ‘Excel Workbook (.xlsx)’ from the drop-down. Note that this location hierarchy must include all of the sites that will be renamed - this is where the script pulls Maximo IDs, Location Numbers, and Site Names from.</li>
+</ul>
+</li>
+<li>Select what type of reports we’re renaming: <code>Space Utilization Reports</code>
+<ul>
+<li>Choose what type of reports are contained in the input directory and will be renamed from the drop-down. Note that this must be the <em>only</em> type of report in input, any other PDFs may be renamed incorrectly using a slightly different scheme. <code>Space Utilization Reports</code> is selected by default as it is the first item in the list, make sure to change this if you’re renaming a different type of report.</li>
+</ul>
+</li>
+</ol>
+<p>Below the four prompts are <code>Close</code> and <code>Run</code> buttons, these work as would be expected, closing the window and running the program.</p>
+<h2>Troubleshooting</h2>
+<blockquote>
+<p>Nothing’s happening when I double click the <code>.JAR</code> file</p>
+</blockquote>
+<p>Ensure you’ve installed Java as specified under <a href="/#Setup">Setup</a>. If you believe you have, try checking your java version:</p>
+<ol>
+<li>Press Ctrl+R, type <code>cmd</code> and press enter - this will open a command prompt window</li>
+<li>Type <code>java -version</code> and press enter</li>
+<li>If you’ve installed java as specified, the first line under your typing should read <code>openjdk version &quot;17.0.8&quot; 2023-07-18</code>. If, instead, it says <code>'java' is not recognized as an internal...</code> then java is not installed.</li>
+</ol>
+<hr />
+<blockquote>
+<p><code>Run</code> isn’t doing anything</p>
+</blockquote>
+<p>Ensure that you’ve selected two directories and a *.xlsx file. Spreadsheets of a different type (.xlsb, .xls, .csv, etc.) will not work.</p>
+<hr />
+<blockquote>
+<p>Certain PDFs are being skipped</p>
+</blockquote>
+<p>Ensure that the file structure matches exactly as described in <a href="/#File-Structure">File Structure</a>. Files and folders not placed in the correct places will be ignored. Consult <code>rename-info.txt</code> to see what’s been skipped.</p>
+<hr />
+<blockquote>
+<p>The year on some files is incorrect</p>
+</blockquote>
+<p>This is possible. Because I’m using Optical Character Recognition (OCR) to pull the year off the first page of the report, the algorithm may not work perfectly and may, very occasionally, read some characters wrong. Ideally, it will catch its error, and you’ll be one troubleshooting option down, but it’s possible, for example, that it reads ‘2018’ as ‘2016’, and there’s no way it can catch that. Hopefully, that never happens. In all the test files I ran this on (~160 or so), it didn’t seem to happen.</p>
+<hr />
+<blockquote>
+<p>What’s this <code>MISSING YEARS</code> folder?</p>
+</blockquote>
+<p>Tesseract, the OCR library I’m using to pull years from the first page of the PDFs, isn’t perfect. Sometimes it can’t find a year. In this case, the program will copy that file, with the rest of the information it can get, into <code>MISSING YEARS</code>, and the user can manually open the PDF, check the first page, and fix that.</p>
+<h2>File Structure</h2>
+<p>The selected input directory must have a file structure that matches as described below. If it does not, some files may be skipped, or the program may have an error. Skipped files may or may not be reported in <code>rename-info.txt</code>.</p>
+<h3>For Space Utilization, AHERA, and FCA App B Reports</h3>
+<ul>
+<li>Input directory
+<ul>
+<li>IA001 A site
+<ul>
+<li>04 Report
+<ul>
+<li>Draft
+<ul>
+<li>report.pdf</li>
+</ul>
+</li>
+<li>Final
+<ul>
+<li>report.pdf</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>JS023 Another site
+<ul>
+<li>06 Reports
+<ul>
+<li>Draft
+<ul>
+<li>report.pdf</li>
+</ul>
+</li>
+<li>Final</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>As shown above, the input directory should contain a series of directories titled starting with a site id. This may be followed by the site name, but does not need to be, the site name for the final rename is pulled from the location hierarchy spreadsheet. Within each site directory must be a folder titled in the format <code>0n Report(s)</code>. That is, a zero followed by another number and then the word ‘report’ or ‘reports’. This is case insensitive. Within the reports directory should be two directories, Draft and Final. The script will first check for a pdf within ‘Final’, if it doesn’t find one it will check ‘Draft’.</p>
+<h3>For EISA Reports</h3>
+<ul>
+<li>Input directory
+<ul>
+<li>IE023 A site
+<ul>
+<li>4 Clean and send to client - PDF
+<ul>
+<li>IE023 A site
+<ul>
+<li>report1.pdf</li>
+<li>report2.pdf</li>
+<li>report3.pdf</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>JS034 Another site
+<ul>
+<li>A building
+<ul>
+<li>6 Clean and send to client - PDF
+<ul>
+<li>report34.pdf</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Another building
+<ul>
+<li>7 Clean and send to client - PDF
+<ul>
+<li>report23report.pdf</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>A third building
+<ul>
+<li>5 Clean and send to client - PDF
+<ul>
+<li>report234.pdf</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>IA034 A third site
+<ul>
+<li>3 Clean and send to client - PDF
+<ul>
+<li>report33asdf.pdf</li>
+<li>304 report.pdf</li>
+<li>report 334.pdf</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>For EISA reports the file format is a bit forgiving, but do still be careful; because it’s more forgiving it sometimes doesn’t report errors and may skip files not organized correctly. Again, the input directory should have directories within it that are named starting with a site ID. Within this, there are two options:</p>
+<ol>
+<li>A directory containing ‘Clean and send to client’ in its name: in this case, reports may be placed directly into ‘Clean and send to client’, or into directories immediately within ‘Clean and send to client’. This is not recursive, so further subdirectories will not be searched.</li>
+<li>Alternatively, the ‘layer’ of subdirectories can be immediately within the site directory. That is, directories within the site folder that themselves have directories named with ‘Clean and send to client’. Reports may then be placed within these ‘Clean and send to client folders’. Subdirectories will not be searched.\</li>
+</ol>
+<p>Note that in either case, reports must have their sub-site id within the file name. In the case that a file does not have a number in its name, it will be skipped and noted in <code>rename-info.txt</code>. If there are multiple numbers in the file name, the last one will be used. This is important, for example, in my testing a report was named <code>343 1st and 2nd Grade.pdf</code>, and the program tried to pull the ‘2’ as the sub-site id. The reason we don’t use the first number is in case a report is already renamed - the sub-site id will be last. For those familiar with Regular Expressions, the expression we use to pull the sub-site id is: <code>\D*(\d+)\D*(?!.*\d)</code>.</p>
+<h2>Details of what it does</h2>
+<p>First, the script runs some initialization stps: creating rename-info.txt, opening the spreadsheet, and starting Tesseract. Then, it wil navigate through the input directory, finding reports in the places specified in <a href="/#File-Structure">File Structure</a>. For each report, it will use the Site Id (and, for EISA reports, the sub-site id), and search the location heirarchy spreadsheet to find the relevant row. From there, it will grab the Maximo Id, Location Number, and Site Name (headed on the spreadsheet as ‘Site Description’). Then, to get the year, the program will open the first page of the pdf as an image and use Tesseract, an optical character recognition (OCR) library to pull the text from that page, then find the year within that (again, to those familiar with Regular Expressions, <code>(\d{2},\s*|\w+\s*)(20\d{2})</code><sup class="footnote-ref"><a href="#fn1" id="fnref1">1</a></sup>). We then put all this information together and copy the file, renamed, to the output directory.</p>
+<h2>Changing the Code</h2>
+<p>The <code>.JAR</code> file is compiled and compressed, meaning it is not human-readable code. If you want to change how the program works, add new features or report types, or anything else, I have uploaded the program files to a github repository uncompiled. That github repository will also include this readme.md (and an HTML version in case you can’t open the .md file), as well as the compiled <code>.JAR</code>.</p>
+<p>The mentioned github repo is <a href="https://github.com/Jaden-Unruh/Combined-Reports-Renaming-Tool">here</a>.</p>
+<h2>In the Github</h2>
+<p>The folder <code>report.renamer-multi</code> contains all of the java code as well as associated data and resource files. It does not contain all the dependency folders, though it does have maven references to them within <code>pom.xml</code> so they can be installed by other users. Hopefully, you can open this directory as a project in any IDE to easily edit the code.</p>
+<p>All of the contents of <code>report.renamer-multi</code> are bundled within <code>Combined Report Renamer.JAR</code>. This is what is distributed to users, it cannot be edited but can be run to perform the script.</p>
+<p>The other two files within the github are this <code>README.md</code>and an equivalent <code>README.html</code>. They are identical, just different file types in case a user can’t open a .md file.</p>
+<section class="footnotes">
+<ol>
+<li id="fn1">
+<p>This is a year, 20##, preceded by either two digits and a comma or one or more words. As such, we’ll capture either, for example, ‘September 23, 2011’, or just ‘September 2011’. This is necessary because different types of reports format their dates differently. <a href="#fnref1" class="footnote-backref">?</a></p>
+</li>
+</ol>
+</section>
+</body></html>
