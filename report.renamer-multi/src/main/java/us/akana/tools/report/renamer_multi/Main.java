@@ -42,9 +42,9 @@ public class Main {
 	static JFrame options;
 	static JLabel info = new JLabel();
 	static final Pattern IE_REGEX = Pattern.compile("IE\\d{3}|IA\\d{3}|JS\\d{3}");
-	//static final Pattern YEAR_REGEX = Pattern.compile("(\\d{2},\\s*)(20\\d{2})"); // ##, 20##
+	// static final Pattern YEAR_REGEX = Pattern.compile("(\\d{2},\\s*)(20\\d{2})");
+	// // ##, 20##
 	static final Pattern YEAR_REGEX = Pattern.compile("(\\d{2},\\s*|\\w+\\s*)(20\\d{2})"); // above or asd 20##
-	static final Pattern SUB_SITE_REGEX = Pattern.compile("\\D*(\\d+)\\D*(?!.*\\d)");
 
 	static File[] selectedFiles = new File[3]; // 0 = input, 1 = output, 2 = location hierarchy spreadsheet
 
@@ -61,6 +61,8 @@ public class Main {
 			"FCA Sub-Site Report App B" };
 
 	static int selectedType = 0;
+	
+	static int totalCount = 0;
 
 	/**
 	 * Entry class
@@ -138,6 +140,7 @@ public class Main {
 			public void actionPerformed(ActionEvent e) {
 				if (selectedFiles[0] != null && selectedFiles[1] != null && selectedFiles[2] != null
 						&& selectedFiles[2].getName().toLowerCase().endsWith(".xlsx")) {
+					totalCount = 0;
 					final File input = selectedFiles[0];
 					final File output = selectedFiles[1];
 					selectedType = reportTypeSelect.getSelectedIndex();
@@ -171,6 +174,7 @@ public class Main {
 						}
 
 						protected void done() {
+							System.out.println(totalCount);
 							try {
 								get();
 							} catch (InterruptedException e) {
@@ -326,7 +330,7 @@ public class Main {
 						}
 					} else
 						writeToInfo.write(
-								String.format("- Multiple 'Clean and send to client folders: %s. Skipping\n", file));
+								String.format("- Multiple 'Clean and send to client' folders: %s. Skipping\n", file));
 				} else
 					writeToInfo
 							.write(String.format("- Found foreign directory in input folder: %s. Skipping...\n", file));
@@ -339,13 +343,12 @@ public class Main {
 		// DATA TO GET:
 		String year, siteId = site, locId, maximoId, siteName, subSite;
 
-		Matcher match = SUB_SITE_REGEX.matcher(file.getName());
-		match.find();
 		try {
-			subSite = match.group(1);
-		} catch (IllegalStateException e) {
-			writeToInfo
-					.write(String.format("- SubSite Number not found in filename: %s for site %s, skipping...\n", file.getName(), site));
+			subSite = getSubSite(file);
+		} catch (IllegalArgumentException | IllegalStateException e) {
+			writeToInfo.write(String.format("- SubSite Number not found in filename: %s for site %s, Copying to FAILED...\n",
+					file.getName(), site));
+			doCopy(file, String.format("%s\\FAILED\\%s", output.getAbsolutePath(), file.getName()));
 			return;
 		}
 
@@ -361,7 +364,9 @@ public class Main {
 				foundRow++;
 
 			if (!mainSheet.getRow(foundRow).getCell(19).getRichStringCellValue().getString().equals(subSite)) {
-				writeToInfo.write(String.format("- Sub-Site not found in sheet: %s -> %s, for file %s. Skipping...\n", site, subSite, file.getName()));
+				writeToInfo.write(String.format("- Sub-Site not found in sheet: %s -> %s, for file %s. Copying to FAILED...\n",
+						site, subSite, file.getName()));
+				doCopy(file, String.format("%s\\FAILED\\%s", output.getAbsolutePath(), file.getName()));
 				return;
 			}
 
@@ -379,16 +384,18 @@ public class Main {
 				try {
 					year = yearMatch.group(2);
 
-					FileUtils.copyFile(file,
-							new File(String.format("%s\\%s_%s_%s_%s_%s_%s_%s.pdf", output.getAbsolutePath(), year,
+					doCopy(file,
+							String.format("%s\\%s_%s_%s_%s_%s_%s_%s.pdf", output.getAbsolutePath(), year,
 									siteId, locId, maximoId, REPORT_STRINGS[selectedType],
-									siteName.replace("/", "-").replace("\\", "-"), subSite)));
+									siteName.replace("/", "-").replace("\\", "-"), subSite));
+					totalCount++;
 				} catch (IllegalStateException e) {
 					year = "YYYY";
 
-					FileUtils.copyFile(file, new File(String.format("%s\\MISSING YEARS\\%s_%s_%s_%s_%s_%s_%s.pdf",
+					doCopy(file, String.format("%s\\MISSING YEARS\\%s_%s_%s_%s_%s_%s_%s.pdf",
 							output.getAbsolutePath(), year, siteId, locId, maximoId, REPORT_STRINGS[selectedType],
-							siteName.replace("/", "-").replace("\\", "-"), subSite)));
+							siteName.replace("/", "-").replace("\\", "-"), subSite));
+					totalCount++;
 
 					writeToInfo.write(String.format(
 							"- Tesseract couldn't find a year on page one of %s for site %s. It's been copied to MISSING YEARS with the remainder of the data, input the year manually.\n",
@@ -399,9 +406,28 @@ public class Main {
 				e.printStackTrace();
 			}
 
-		} else
-			writeToInfo.write(String.format("- %s not found in sheet, skipping report...\n", site));
-
+		} else {
+			writeToInfo.write(String.format("- %s not found in sheet, copying to FAILED...\n", site));
+			doCopy(file, String.format("%s\\FAILED\\%s", output.getAbsolutePath(), file.getName()));
+		}
+	}
+	
+	static Pattern FIRST_NUM = Pattern.compile("\\D*(\\d+)");
+	static Pattern LAST_NUM = Pattern.compile("\\D*(\\d+)\\D*(?!.*\\d)");
+	static Pattern YEAR = Pattern.compile("20\\d{2}");
+	
+	static String getSubSite(File file) throws IllegalArgumentException, IllegalStateException {
+		String name = file.getName();
+		Matcher firstNumMatch = FIRST_NUM.matcher(name);
+		firstNumMatch.find();
+		String firstNum = firstNumMatch.group(1);
+		if (!YEAR.matcher(firstNum).matches())
+			return firstNum;
+		else {
+			Matcher lastNumMatcher = LAST_NUM.matcher(name);
+			lastNumMatcher.find();
+			return lastNumMatcher.group(1);
+		}
 	}
 
 	/**
@@ -436,17 +462,19 @@ public class Main {
 				try {
 					year = match.group(2);
 
-					FileUtils.copyFile(file,
-							new File(String.format("%s\\%s_%s_%s_%s_%s_%s.pdf", output.getAbsolutePath(), year, siteId,
+					doCopy(file,
+							String.format("%s\\%s_%s_%s_%s_%s_%s.pdf", output.getAbsolutePath(), year, siteId,
 									locId, maximoId, REPORT_STRINGS[selectedType],
-									siteName.replace("/", "-").replace("\\", "-"))));
+									siteName.replace("/", "-").replace("\\", "-")));
+					totalCount++;
 				} catch (IllegalStateException e) {
 					year = "YYYY";
 
-					FileUtils.copyFile(file,
-							new File(String.format("%s\\MISSING YEARS\\%s_%s_%s_%s_%s_%s.pdf", output.getAbsolutePath(),
+					doCopy(file,
+							String.format("%s\\MISSING YEARS\\%s_%s_%s_%s_%s_%s.pdf", output.getAbsolutePath(),
 									year, siteId, locId, maximoId, REPORT_STRINGS[selectedType],
-									siteName.replace("/", "-").replace("\\", "-"))));
+									siteName.replace("/", "-").replace("\\", "-")));
+					totalCount++;
 
 					writeToInfo.write(String.format(
 							"- Tesseract couldn't find a year on page one of %s for site %s. It's been copied to MISSING YEARS with the remainder of the data, input the year manually.\n",
@@ -460,6 +488,26 @@ public class Main {
 			writeToInfo.write(String.format("- %s not found in sheet, skipping report...\n", site));
 	}
 
+	static void doCopy(File file, String outPath) throws IOException {
+		
+		File outFile = new File(outPath);
+		
+		int count = 1;
+		boolean didCount = false;
+		
+		while (outFile.isFile()) {
+			didCount = true;
+			outPath += String.format(" (%s)", count);
+			count++;
+			outFile = new File(outPath);
+		}
+		
+		FileUtils.copyFile(file, outFile);
+		
+		if (didCount)
+			writeToInfo.write(String.format("- Duplicate file written, something went wrong: %s\n", outPath));
+	}
+	
 	/**
 	 * Extracts text from the given image using Tesseract OCR
 	 * 
@@ -579,7 +627,7 @@ class PDFFileFilter implements FilenameFilter {
 
 /**
  * A file filter that only accepts files with exactly "Clean and send to client"
- * in their names
+ * or "Final Report to BIA" in their names
  * 
  * @author Jaden
  *
@@ -587,6 +635,7 @@ class PDFFileFilter implements FilenameFilter {
 class CleanFileFilter implements FilenameFilter {
 	@Override
 	public boolean accept(File arg0, String arg1) {
-		return arg1.contains("Clean and send to client") && arg0.isDirectory();
+		return (arg1.contains("Clean and send to client") || arg1.contains("Final Report to BIA"))
+				&& arg0.isDirectory();
 	}
 }
