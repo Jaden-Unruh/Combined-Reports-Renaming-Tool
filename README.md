@@ -84,12 +84,20 @@ As shown above, the input directory should contain a series of directories title
 			- report33asdf.pdf
 			- 304 report.pdf
 			- report 334.pdf
+	- IA063 A fourth site
+		- 6 - Final Report to BIA
+			- 394 report.pdf
+			- 320 asdf.pdf
+			- 032 eisa.pdf
 
 For EISA reports the file format is a bit forgiving, but do still be careful; because it's more forgiving it sometimes doesn't report errors and may skip files not organized correctly. Again, the input directory should have directories within it that are named starting with a site ID. Within this, there are two options:
 1. A directory containing 'Clean and send to client' in its name: in this case, reports may be placed directly into 'Clean and send to client', or into directories immediately within 'Clean and send to client'. This is not recursive, so further subdirectories will not be searched.
-2. Alternatively, the 'layer' of subdirectories can be immediately within the site directory. That is, directories within the site folder that themselves have directories named with 'Clean and send to client'. Reports may then be placed within these 'Clean and send to client folders'. Subdirectories will not be searched.\
+2. Alternatively, the 'layer' of subdirectories can be immediately within the site directory. That is, directories within the site folder that themselves have directories named with 'Clean and send to client'. Reports may then be placed within these 'Clean and send to client folders'. Subdirectories will not be searched.
 
 Note that in either case, reports must have their sub-site id within the file name. In the case that a file does not have a number in its name, it will be skipped and noted in `rename-info.txt`. If there are multiple numbers in the file name, the last one will be used. This is important, for example, in my testing a report was named `343 1st and 2nd Grade.pdf`, and the program tried to pull the '2' as the sub-site id. The reason we don't use the first number is in case a report is already renamed - the sub-site id will be last. For those familiar with Regular Expressions, the expression we use to pull the sub-site id is: `\D*(\d+)\D*(?!.*\d)`.
+
+#### Update 9/13/2023
+Folders may now be titled as something containing "`Final Report to BIA`" anywhere they were previously required to contain "`Clean and send to client`". This is **in addition to**, not explicitly instead of the old naming requirement.
 
 ## Details of what it does
 First, the script runs some initialization steps: creating rename-info.txt, opening the spreadsheet, and starting Tesseract. Then, it wil navigate through the input directory, finding reports in the places specified in [File Structure](/#File-Structure). For each report, it will use the Site Id (and, for EISA reports, the sub-site id), and search the location heirarchy spreadsheet to find the relevant row. From there, it will grab the Maximo Id, Location Number, and Site Name (headed on the spreadsheet as 'Site Description'). Then, to get the year, the program will open the first page of the pdf as an image and use Tesseract, an optical character recognition (OCR) library to pull the text from that page, then find the year within that (again, to those familiar with Regular Expressions, `(\d{2},\s*|\w+\s*)(20\d{2})`[^1]). We then put all this information together and copy the file, renamed, to the output directory.

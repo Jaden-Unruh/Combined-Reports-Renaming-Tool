@@ -3,7 +3,7 @@
 <h2>Setup</h2>
 <p>Java SE 17 is required to run this program. An installer for Temurin/OpenJDK 17 should be included with the file, running the installer will open a window guiding you through the installation. Leaving everything as default should work perfectly, just click through the pages. If the installer is not included, it can be downloaded from <a href="https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.8%2B7/OpenJDK17U-jdk_x64_windows_hotspot_17.0.8_7.msi">here</a>. After installing Temurin/Java 17, the <code>.JAR</code> should run just by double-clicking.</p>
 <h2>GUI and How to Use</h2>
-<p>After double-clicking the <code>JAR</code>, a window titled ‚ÄúRename Reports Tool‚Äù will open. It will have four prompts, as described below:</p>
+<p>After double-clicking the <code>JAR</code>, a window titled ìRename Reports Toolî will open. It will have four prompts, as described below:</p>
 <ol>
 <li>Select an input directory: <code>Select...</code>
 <ul>
@@ -17,46 +17,46 @@
 </li>
 <li>Select location hierarchy spreadsheet (*.xlsx): <code>Select...</code>
 <ul>
-<li>Click on the select button to open a file prompt, navigate to and select the location hierarchy spreadsheet. Note that this must be a <code>.xlsx</code> file, rather than <code>.xlsb</code>or any other spreadsheet format. This can be obtained by opening any other format in excel and selecting ‚ÄòFile -&gt; Save As -&gt; This PC‚Äô and choosing ‚ÄòExcel Workbook (.xlsx)‚Äô from the drop-down. Note that this location hierarchy must include all of the sites that will be renamed - this is where the script pulls Maximo IDs, Location Numbers, and Site Names from.</li>
+<li>Click on the select button to open a file prompt, navigate to and select the location hierarchy spreadsheet. Note that this must be a <code>.xlsx</code> file, rather than <code>.xlsb</code>or any other spreadsheet format. This can be obtained by opening any other format in excel and selecting ëFile -&gt; Save As -&gt; This PCí and choosing ëExcel Workbook (.xlsx)í from the drop-down. Note that this location hierarchy must include all of the sites that will be renamed - this is where the script pulls Maximo IDs, Location Numbers, and Site Names from.</li>
 </ul>
 </li>
-<li>Select what type of reports we‚Äôre renaming: <code>Space Utilization Reports</code>
+<li>Select what type of reports weíre renaming: <code>Space Utilization Reports</code>
 <ul>
-<li>Choose what type of reports are contained in the input directory and will be renamed from the drop-down. Note that this must be the <em>only</em> type of report in input, any other PDFs may be renamed incorrectly using a slightly different scheme. <code>Space Utilization Reports</code> is selected by default as it is the first item in the list, make sure to change this if you‚Äôre renaming a different type of report.</li>
+<li>Choose what type of reports are contained in the input directory and will be renamed from the drop-down. Note that this must be the <em>only</em> type of report in input, any other PDFs may be renamed incorrectly using a slightly different scheme. <code>Space Utilization Reports</code> is selected by default as it is the first item in the list, make sure to change this if youíre renaming a different type of report.</li>
 </ul>
 </li>
 </ol>
 <p>Below the four prompts are <code>Close</code> and <code>Run</code> buttons, these work as would be expected, closing the window and running the program.</p>
 <h2>Troubleshooting</h2>
 <blockquote>
-<p>Nothing‚Äôs happening when I double click the <code>.JAR</code> file</p>
+<p>Nothingís happening when I double click the <code>.JAR</code> file</p>
 </blockquote>
-<p>Ensure you‚Äôve installed Java as specified under <a href="#Setup">Setup</a>. If you believe you have, try checking your java version:</p>
+<p>Ensure youíve installed Java as specified under <a href="/#Setup">Setup</a>. If you believe you have, try checking your java version:</p>
 <ol>
 <li>Press Ctrl+R, type <code>cmd</code> and press enter - this will open a command prompt window</li>
 <li>Type <code>java -version</code> and press enter</li>
-<li>If you‚Äôve installed java as specified, the first line under your typing should read <code>openjdk version &quot;17.0.8&quot; 2023-07-18</code>. If, instead, it says <code>'java' is not recognized as an internal...</code> then java is not installed.</li>
+<li>If youíve installed java as specified, the first line under your typing should read <code>openjdk version &quot;17.0.8&quot; 2023-07-18</code>. If, instead, it says <code>'java' is not recognized as an internal...</code> then java is not installed.</li>
 </ol>
 <hr />
 <blockquote>
-<p><code>Run</code> isn‚Äôt doing anything</p>
+<p><code>Run</code> isnít doing anything</p>
 </blockquote>
-<p>Ensure that you‚Äôve selected two directories and a *.xlsx file. Spreadsheets of a different type (.xlsb, .xls, .csv, etc.) will not work.</p>
+<p>Ensure that youíve selected two directories and a *.xlsx file. Spreadsheets of a different type (.xlsb, .xls, .csv, etc.) will not work.</p>
 <hr />
 <blockquote>
 <p>Certain PDFs are being skipped</p>
 </blockquote>
-<p>Ensure that the file structure matches exactly as described in <a href="#File-Structure">File Structure</a>. Files and folders not placed in the correct places will be ignored. Consult <code>rename-info.txt</code> to see what‚Äôs been skipped.</p>
+<p>Ensure that the file structure matches exactly as described in <a href="/#File-Structure">File Structure</a>. Files and folders not placed in the correct places will be ignored. Consult <code>rename-info.txt</code> to see whatís been skipped.</p>
 <hr />
 <blockquote>
 <p>The year on some files is incorrect</p>
 </blockquote>
-<p>This is possible. Because I‚Äôm using Optical Character Recognition (OCR) to pull the year off the first page of the report, the algorithm may not work perfectly and may, very occasionally, read some characters wrong. Ideally, it will catch its error, and you‚Äôll be one troubleshooting option down, but it‚Äôs possible, for example, that it reads ‚Äò2018‚Äô as ‚Äò2016‚Äô, and there‚Äôs no way it can catch that. Hopefully, that never happens. In all the test files I ran this on (~160 or so), it didn‚Äôt seem to happen.</p>
+<p>This is possible. Because Iím using Optical Character Recognition (OCR) to pull the year off the first page of the report, the algorithm may not work perfectly and may, very occasionally, read some characters wrong. Ideally, it will catch its error, and youíll be one troubleshooting option down, but itís possible, for example, that it reads ë2018í as ë2016í, and thereís no way it can catch that. Hopefully, that never happens. In all the test files I ran this on (~160 or so), it didnít seem to happen.</p>
 <hr />
 <blockquote>
-<p>What‚Äôs this <code>MISSING YEARS</code> folder?</p>
+<p>Whatís this <code>MISSING YEARS</code> folder?</p>
 </blockquote>
-<p>Tesseract, the OCR library I‚Äôm using to pull years from the first page of the PDFs, isn‚Äôt perfect. Sometimes it can‚Äôt find a year. In this case, the program will copy that file, with the rest of the information it can get, into <code>MISSING YEARS</code>, and the user can manually open the PDF, check the first page, and fix that.</p>
+<p>Tesseract, the OCR library Iím using to pull years from the first page of the PDFs, isnít perfect. Sometimes it canít find a year. In this case, the program will copy that file, with the rest of the information it can get, into <code>MISSING YEARS</code>, and the user can manually open the PDF, check the first page, and fix that.</p>
 <h2>File Structure</h2>
 <p>The selected input directory must have a file structure that matches as described below. If it does not, some files may be skipped, or the program may have an error. Skipped files may or may not be reported in <code>rename-info.txt</code>.</p>
 <h3>For Space Utilization, AHERA, and FCA App B Reports</h3>
@@ -98,7 +98,7 @@
 </ul>
 </li>
 </ul>
-<p>As shown above, the input directory should contain a series of directories titled starting with a site id. This may be followed by the site name, but does not need to be, the site name for the final rename is pulled from the location hierarchy spreadsheet. Within each site directory must be a folder titled in the format <code>0n Report(s)</code>. That is, a zero followed by another number and then the word ‚Äòreport‚Äô or ‚Äòreports‚Äô. This is case insensitive. Within the reports directory should be two directories, Draft and Final. The script will first check for a pdf within ‚ÄòFinal‚Äô, if it doesn‚Äôt find one it will check ‚ÄòDraft‚Äô.</p>
+<p>As shown above, the input directory should contain a series of directories titled starting with a site id. This may be followed by the site name, but does not need to be, the site name for the final rename is pulled from the location hierarchy spreadsheet. Within each site directory must be a folder titled in the format <code>0n Report(s)</code>. That is, a zero followed by another number and then the word ëreportí or ëreportsí. This is case insensitive. Within the reports directory should be two directories, Draft and Final. The script will first check for a pdf within ëFinalí, if it doesnít find one it will check ëDraftí.</p>
 <h3>For EISA Reports</h3>
 <ul>
 <li>Input directory
@@ -160,28 +160,41 @@
 </li>
 </ul>
 </li>
+<li>IA063 A fourth site
+<ul>
+<li>6 - Final Report to BIA
+<ul>
+<li>394 report.pdf</li>
+<li>320 asdf.pdf</li>
+<li>032 eisa.pdf</li>
 </ul>
 </li>
 </ul>
-<p>For EISA reports the file format is a bit forgiving, but do still be careful; because it‚Äôs more forgiving it sometimes doesn‚Äôt report errors and may skip files not organized correctly. Again, the input directory should have directories within it that are named starting with a site ID. Within this, there are two options:</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>For EISA reports the file format is a bit forgiving, but do still be careful; because itís more forgiving it sometimes doesnít report errors and may skip files not organized correctly. Again, the input directory should have directories within it that are named starting with a site ID. Within this, there are two options:</p>
 <ol>
-<li>A directory containing ‚ÄòClean and send to client‚Äô in its name: in this case, reports may be placed directly into ‚ÄòClean and send to client‚Äô, or into directories immediately within ‚ÄòClean and send to client‚Äô. This is not recursive, so further subdirectories will not be searched.</li>
-<li>Alternatively, the ‚Äòlayer‚Äô of subdirectories can be immediately within the site directory. That is, directories within the site folder that themselves have directories named with ‚ÄòClean and send to client‚Äô. Reports may then be placed within these ‚ÄòClean and send to client folders‚Äô. Subdirectories will not be searched.\</li>
+<li>A directory containing ëClean and send to clientí in its name: in this case, reports may be placed directly into ëClean and send to clientí, or into directories immediately within ëClean and send to clientí. This is not recursive, so further subdirectories will not be searched.</li>
+<li>Alternatively, the ëlayerí of subdirectories can be immediately within the site directory. That is, directories within the site folder that themselves have directories named with ëClean and send to clientí. Reports may then be placed within these ëClean and send to client foldersí. Subdirectories will not be searched.</li>
 </ol>
-<p>Note that in either case, reports must have their sub-site id within the file name. In the case that a file does not have a number in its name, it will be skipped and noted in <code>rename-info.txt</code>. If there are multiple numbers in the file name, the last one will be used. This is important, for example, in my testing a report was named <code>343 1st and 2nd Grade.pdf</code>, and the program tried to pull the ‚Äò2‚Äô as the sub-site id. The reason we don‚Äôt use the first number is in case a report is already renamed - the sub-site id will be last. For those familiar with Regular Expressions, the expression we use to pull the sub-site id is: <code>\D*(\d+)\D*(?!.*\d)</code>.</p>
+<p>Note that in either case, reports must have their sub-site id within the file name. In the case that a file does not have a number in its name, it will be skipped and noted in <code>rename-info.txt</code>. If there are multiple numbers in the file name, the last one will be used. This is important, for example, in my testing a report was named <code>343 1st and 2nd Grade.pdf</code>, and the program tried to pull the ë2í as the sub-site id. The reason we donít use the first number is in case a report is already renamed - the sub-site id will be last. For those familiar with Regular Expressions, the expression we use to pull the sub-site id is: <code>\D*(\d+)\D*(?!.*\d)</code>.</p>
+<h4>Update 9/13/2023</h4>
+<p>Folders may now be titled as something containing ì<code>Final Report to BIA</code>î anywhere they were previously required to contain ì<code>Clean and send to client</code>î. This is <strong>in addition to</strong>, not explicitly instead of the old naming requirement.</p>
 <h2>Details of what it does</h2>
-<p>First, the script runs some initialization stps: creating rename-info.txt, opening the spreadsheet, and starting Tesseract. Then, it wil navigate through the input directory, finding reports in the places specified in <a href="#File-Structure">File Structure</a>. For each report, it will use the Site Id (and, for EISA reports, the sub-site id), and search the location heirarchy spreadsheet to find the relevant row. From there, it will grab the Maximo Id, Location Number, and Site Name (headed on the spreadsheet as ‚ÄòSite Description‚Äô). Then, to get the year, the program will open the first page of the pdf as an image and use Tesseract, an optical character recognition (OCR) library to pull the text from that page, then find the year within that (again, to those familiar with Regular Expressions, <code>(\d{2},\s*|\w+\s*)(20\d{2})</code><sup class="footnote-ref"><a href="#fn1" id="fnref1">1</a></sup>). We then put all this information together and copy the file, renamed, to the output directory.</p>
+<p>First, the script runs some initialization steps: creating rename-info.txt, opening the spreadsheet, and starting Tesseract. Then, it wil navigate through the input directory, finding reports in the places specified in <a href="/#File-Structure">File Structure</a>. For each report, it will use the Site Id (and, for EISA reports, the sub-site id), and search the location heirarchy spreadsheet to find the relevant row. From there, it will grab the Maximo Id, Location Number, and Site Name (headed on the spreadsheet as ëSite Descriptioní). Then, to get the year, the program will open the first page of the pdf as an image and use Tesseract, an optical character recognition (OCR) library to pull the text from that page, then find the year within that (again, to those familiar with Regular Expressions, <code>(\d{2},\s*|\w+\s*)(20\d{2})</code><sup class="footnote-ref"><a href="#fn-1" id="fnref-1" data-footnote-ref>1</a></sup>). We then put all this information together and copy the file, renamed, to the output directory.</p>
 <h2>Changing the Code</h2>
-<p>The <code>.JAR</code> file is compiled and compressed, meaning it is not human-readable code. If you want to change how the program works, add new features or report types, or anything else, I have uploaded the program files to a github repository uncompiled. That github repository will also include this readme.md (and an HTML version in case you can‚Äôt open the .md file), as well as the compiled <code>.JAR</code>.</p>
+<p>The <code>.JAR</code> file is compiled and compressed, meaning it is not human-readable code. If you want to change how the program works, add new features or report types, or anything else, I have uploaded the program files to a github repository uncompiled. That github repository will also include this readme.md (and an HTML version in case you canít open the .md file), as well as the compiled <code>.JAR</code>.</p>
 <p>The mentioned github repo is <a href="https://github.com/Jaden-Unruh/Combined-Reports-Renaming-Tool">here</a>.</p>
 <h2>In the Github</h2>
 <p>The folder <code>report.renamer-multi</code> contains all of the java code as well as associated data and resource files. It does not contain all the dependency folders, though it does have maven references to them within <code>pom.xml</code> so they can be installed by other users. Hopefully, you can open this directory as a project in any IDE to easily edit the code.</p>
 <p>All of the contents of <code>report.renamer-multi</code> are bundled within <code>Combined Report Renamer.JAR</code>. This is what is distributed to users, it cannot be edited but can be run to perform the script.</p>
-<p>The other two files within the github are this <code>README.md</code>and an equivalent <code>README.html</code>. They are identical, just different file types in case a user can‚Äôt open a .md file.</p>
-<section class="footnotes">
+<p>The other two files within the github are this <code>README.md</code>and an equivalent <code>README.html</code>. They are identical, just different file types in case a user canít open a .md file.</p>
+<section class="footnotes" data-footnotes>
 <ol>
-<li id="fn1">
-<p>This is a year, 20##, preceded by either two digits and a comma or one or more words. As such, we‚Äôll capture either, for example, ‚ÄòSeptember 23, 2011‚Äô, or just ‚ÄòSeptember 2011‚Äô. This is necessary because different types of reports format their dates differently. <a href="#fnref1" class="footnote-backref">?</a></p>
+<li id="fn-1">
+<p>This is a year, 20##, preceded by either two digits and a comma or one or more words. As such, weíll capture either, for example, ëSeptember 23, 2011í, or just ëSeptember 2011í. This is necessary because different types of reports format their dates differently. <a href="#fnref-1" class="footnote-backref" data-footnote-backref aria-label="Back to content">?</a></p>
 </li>
 </ol>
 </section>
