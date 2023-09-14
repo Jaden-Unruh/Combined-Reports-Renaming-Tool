@@ -57,6 +57,11 @@
 <p>What’s this <code>MISSING YEARS</code> folder?</p>
 </blockquote>
 <p>Tesseract, the OCR library I’m using to pull years from the first page of the PDFs, isn’t perfect. Sometimes it can’t find a year. In this case, the program will copy that file, with the rest of the information it can get, into <code>MISSING YEARS</code>, and the user can manually open the PDF, check the first page, and fix that.</p>
+<hr />
+<blockquote>
+<p>What’s this <code>FAILED</code> folder?</p>
+</blockquote>
+<p>In the current update, this will only appear for EISA files. This is when the script couldn’t find a valid building number in the reports name, and thus couldn’t rename the file. These reports will all still have their original name and should be renamed manually.</p>
 <h2>File Structure</h2>
 <p>The selected input directory must have a file structure that matches as described below. If it does not, some files may be skipped, or the program may have an error. Skipped files may or may not be reported in <code>rename-info.txt</code>.</p>
 <h3>For Space Utilization, AHERA, and FCA App B Reports</h3>
@@ -179,11 +184,18 @@
 <li>A directory containing ‘Clean and send to client’ in its name: in this case, reports may be placed directly into ‘Clean and send to client’, or into directories immediately within ‘Clean and send to client’. This is not recursive, so further subdirectories will not be searched.</li>
 <li>Alternatively, the ‘layer’ of subdirectories can be immediately within the site directory. That is, directories within the site folder that themselves have directories named with ‘Clean and send to client’. Reports may then be placed within these ‘Clean and send to client folders’. Subdirectories will not be searched.</li>
 </ol>
-<p>Note that in either case, reports must have their sub-site id within the file name. In the case that a file does not have a number in its name, it will be skipped and noted in <code>rename-info.txt</code>. If there are multiple numbers in the file name, the last one will be used. This is important, for example, in my testing a report was named <code>343 1st and 2nd Grade.pdf</code>, and the program tried to pull the ‘2’ as the sub-site id. The reason we don’t use the first number is in case a report is already renamed - the sub-site id will be last. For those familiar with Regular Expressions, the expression we use to pull the sub-site id is: <code>\D*(\d+)\D*(?!.*\d)</code>.</p>
+<p>Note that in either case, reports must have a building id within their file name. In the case that a file does not have a number in its name, it will be copied to FAILED, un-renamed, to be renamed manually. If there are multiple numbers within the file name, the script will do the following to make its best guess at which is the building number<sup class="footnote-ref"><a href="#fn-1" id="fnref-1" data-footnote-ref>1</a></sup>:</p>
+<ul>
+<li>first, grab the first number in the file name (<code>\D*(\d+)</code>)</li>
+<li>if the first number is a year (<code>20\d{2}</code>), use the last number in the file name (<code>\D*(\d+)\D*(?!.*\d)</code>)</li>
+<li>otherwise, use the first number we already have
+The reason we do these steps is because usually the reports are named with the building number at the beginning. However, after the reports are renamed, this will be at the end of the file name. Additionally, sometimes reports have a date at the beginning, generally formatted with the year first. In either of these cases, we’ll still handle the reports correctly.</li>
+</ul>
+<p>If this building number doesn’t correspond to a row in the location hierarchy spreadsheet, or if the script can’t find a building number, the report will be copied to ‘FAILED’, unrenamed. The user will have to rename the report manually.</p>
 <h4>Update 9/13/2023</h4>
 <p>Folders may now be titled as something containing “<code>Final Report to BIA</code>” anywhere they were previously required to contain “<code>Clean and send to client</code>”. This is <strong>in addition to</strong>, not explicitly instead of the old naming requirement.</p>
 <h2>Details of what it does</h2>
-<p>First, the script runs some initialization steps: creating rename-info.txt, opening the spreadsheet, and starting Tesseract. Then, it wil navigate through the input directory, finding reports in the places specified in <a href="/#File-Structure">File Structure</a>. For each report, it will use the Site Id (and, for EISA reports, the sub-site id), and search the location heirarchy spreadsheet to find the relevant row. From there, it will grab the Maximo Id, Location Number, and Site Name (headed on the spreadsheet as ‘Site Description’). Then, to get the year, the program will open the first page of the pdf as an image and use Tesseract, an optical character recognition (OCR) library to pull the text from that page, then find the year within that (again, to those familiar with Regular Expressions, <code>(\d{2},\s*|\w+\s*)(20\d{2})</code><sup class="footnote-ref"><a href="#fn-1" id="fnref-1" data-footnote-ref>1</a></sup>). We then put all this information together and copy the file, renamed, to the output directory.</p>
+<p>First, the script runs some initialization steps: creating rename-info.txt, opening the spreadsheet, and starting Tesseract. Then, it wil navigate through the input directory, finding reports in the places specified in <a href="/#File-Structure">File Structure</a>. For each report, it will use the Site Id (and, for EISA reports, the sub-site id), and search the location heirarchy spreadsheet to find the relevant row. From there, it will grab the Maximo Id, Location Number, and Site Name (headed on the spreadsheet as ‘Site Description’). Then, to get the year, the program will open the first page of the pdf as an image and use Tesseract, an optical character recognition (OCR) library to pull the text from that page, then find the year within that (the regular expression here is <code>(\d{2},\s*|\w+\s*)(20\d{2})</code><sup class="footnote-ref"><a href="#fn-2" id="fnref-2" data-footnote-ref>2</a></sup>). We then put all this information together and copy the file, renamed, to the output directory.</p>
 <h2>Changing the Code</h2>
 <p>The <code>.JAR</code> file is compiled and compressed, meaning it is not human-readable code. If you want to change how the program works, add new features or report types, or anything else, I have uploaded the program files to a github repository uncompiled. That github repository will also include this readme.md (and an HTML version in case you can’t open the .md file), as well as the compiled <code>.JAR</code>.</p>
 <p>The mentioned github repo is <a href="https://github.com/Jaden-Unruh/Combined-Reports-Renaming-Tool">here</a>.</p>
@@ -194,7 +206,10 @@
 <section class="footnotes" data-footnotes>
 <ol>
 <li id="fn-1">
-<p>This is a year, 20##, preceded by either two digits and a comma or one or more words. As such, we’ll capture either, for example, ‘September 23, 2011’, or just ‘September 2011’. This is necessary because different types of reports format their dates differently. <a href="#fnref-1" class="footnote-backref" data-footnote-backref aria-label="Back to content">?</a></p>
+<p>Strings in parentheses in this section are Regular Expressions, specifying how we do each step <a href="#fnref-1" class="footnote-backref" data-footnote-backref aria-label="Back to content">?</a></p>
+</li>
+<li id="fn-2">
+<p>This is a year, 20##, preceded by either two digits and a comma or one or more words. As such, we’ll capture either, for example, ‘September 23, 2011’, or just ‘September 2011’. This is necessary because different types of reports format their dates differently. <a href="#fnref-2" class="footnote-backref" data-footnote-backref aria-label="Back to content">?</a></p>
 </li>
 </ol>
 </section>

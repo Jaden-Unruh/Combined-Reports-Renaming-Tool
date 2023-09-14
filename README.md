@@ -43,6 +43,11 @@ This is possible. Because I'm using Optical Character Recognition (OCR) to pull 
 
 Tesseract, the OCR library I'm using to pull years from the first page of the PDFs, isn't perfect. Sometimes it can't find a year. In this case, the program will copy that file, with the rest of the information it can get, into `MISSING YEARS`, and the user can manually open the PDF, check the first page, and fix that.
 
+---
+> What's this `FAILED` folder?
+
+In the current update, this will only appear for EISA files. This is when the script couldn't find a valid building number in the reports name, and thus couldn't rename the file. These reports will all still have their original name and should be renamed manually.
+
 ## File Structure
 The selected input directory must have a file structure that matches as described below. If it does not, some files may be skipped, or the program may have an error. Skipped files may or may not be reported in `rename-info.txt`.
 ### For Space Utilization, AHERA, and FCA App B Reports
@@ -94,15 +99,23 @@ For EISA reports the file format is a bit forgiving, but do still be careful; be
 1. A directory containing 'Clean and send to client' in its name: in this case, reports may be placed directly into 'Clean and send to client', or into directories immediately within 'Clean and send to client'. This is not recursive, so further subdirectories will not be searched.
 2. Alternatively, the 'layer' of subdirectories can be immediately within the site directory. That is, directories within the site folder that themselves have directories named with 'Clean and send to client'. Reports may then be placed within these 'Clean and send to client folders'. Subdirectories will not be searched.
 
-Note that in either case, reports must have their sub-site id within the file name. In the case that a file does not have a number in its name, it will be skipped and noted in `rename-info.txt`. If there are multiple numbers in the file name, the last one will be used. This is important, for example, in my testing a report was named `343 1st and 2nd Grade.pdf`, and the program tried to pull the '2' as the sub-site id. The reason we don't use the first number is in case a report is already renamed - the sub-site id will be last. For those familiar with Regular Expressions, the expression we use to pull the sub-site id is: `\D*(\d+)\D*(?!.*\d)`.
+Note that in either case, reports must have a building id within their file name. In the case that a file does not have a number in its name, it will be copied to FAILED, un-renamed, to be renamed manually. If there are multiple numbers within the file name, the script will do the following to make its best guess at which is the building number[^1]:
+- first, grab the first number in the file name (`\D*(\d+)`)
+- if the first number is a year (`20\d{2}`), use the last number in the file name (`\D*(\d+)\D*(?!.*\d)`)
+- otherwise, use the first number we already have
+The reason we do these steps is because usually the reports are named with the building number at the beginning. However, after the reports are renamed, this will be at the end of the file name. Additionally, sometimes reports have a date at the beginning, generally formatted with the year first. In either of these cases, we'll still handle the reports correctly.
+
+If this building number doesn't correspond to a row in the location hierarchy spreadsheet, or if the script can't find a building number, the report will be copied to 'FAILED', unrenamed. The user will have to rename the report manually.
+
+[^1]: Strings in parentheses in this section are Regular Expressions, specifying how we do each step
 
 #### Update 9/13/2023
 Folders may now be titled as something containing "`Final Report to BIA`" anywhere they were previously required to contain "`Clean and send to client`". This is **in addition to**, not explicitly instead of the old naming requirement.
 
 ## Details of what it does
-First, the script runs some initialization steps: creating rename-info.txt, opening the spreadsheet, and starting Tesseract. Then, it wil navigate through the input directory, finding reports in the places specified in [File Structure](/#File-Structure). For each report, it will use the Site Id (and, for EISA reports, the sub-site id), and search the location heirarchy spreadsheet to find the relevant row. From there, it will grab the Maximo Id, Location Number, and Site Name (headed on the spreadsheet as 'Site Description'). Then, to get the year, the program will open the first page of the pdf as an image and use Tesseract, an optical character recognition (OCR) library to pull the text from that page, then find the year within that (again, to those familiar with Regular Expressions, `(\d{2},\s*|\w+\s*)(20\d{2})`[^1]). We then put all this information together and copy the file, renamed, to the output directory.
+First, the script runs some initialization steps: creating rename-info.txt, opening the spreadsheet, and starting Tesseract. Then, it wil navigate through the input directory, finding reports in the places specified in [File Structure](/#File-Structure). For each report, it will use the Site Id (and, for EISA reports, the sub-site id), and search the location heirarchy spreadsheet to find the relevant row. From there, it will grab the Maximo Id, Location Number, and Site Name (headed on the spreadsheet as 'Site Description'). Then, to get the year, the program will open the first page of the pdf as an image and use Tesseract, an optical character recognition (OCR) library to pull the text from that page, then find the year within that (the regular expression here is `(\d{2},\s*|\w+\s*)(20\d{2})`[^2]). We then put all this information together and copy the file, renamed, to the output directory.
 
-[^1]: This is a year, 20##, preceded by either two digits and a comma or one or more words. As such, we'll capture either, for example, 'September 23, 2011', or just 'September 2011'. This is necessary because different types of reports format their dates differently.
+[^2]: This is a year, 20##, preceded by either two digits and a comma or one or more words. As such, we'll capture either, for example, 'September 23, 2011', or just 'September 2011'. This is necessary because different types of reports format their dates differently.
 
 ## Changing the Code
 The `.JAR` file is compiled and compressed, meaning it is not human-readable code. If you want to change how the program works, add new features or report types, or anything else, I have uploaded the program files to a github repository uncompiled. That github repository will also include this readme.md (and an HTML version in case you can't open the .md file), as well as the compiled `.JAR`.
